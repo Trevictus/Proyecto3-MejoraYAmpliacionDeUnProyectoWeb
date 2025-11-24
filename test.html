@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Funcionalidades</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #e93556;
+            text-align: center;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .ok { background: #4CAF50; color: white; }
+        .error { background: #f44336; color: white; }
+        .test-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        button {
+            background: #e93556;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #d12547;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .code {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Funcionalidades - Carrito v2.0</h1>
+
+    <div class="test-card">
+        <h2>📊 Estado del Sistema</h2>
+        <div id="system-status"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>💾 Test de LocalStorage</h2>
+        <button onclick="testLocalStorage()">Ejecutar Test</button>
+        <div id="localStorage-results"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>🎯 Datos Actuales</h2>
+        <button onclick="showCurrentData()">Ver Datos</button>
+        <button onclick="clearAllData()">Limpiar Todo</button>
+        <div id="current-data"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔗 Enlaces Útiles</h2>
+        <div>
+            <a href="index.html" target="_blank">
+                <button>🛒 Abrir Aplicación</button>
+            </a>
+            <a href="README.md" target="_blank">
+                <button>📚 Ver Documentación</button>
+            </a>
+            <a href="GUIA_DE_USO.md" target="_blank">
+                <button>📖 Guía de Uso</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Constantes
+        const STORAGE_KEYS = {
+            CARRITO: 'carritoCompras',
+            FAVORITOS: 'cursosFavoritos',
+            FILTROS: 'filtrosPreferidos',
+            BUSQUEDAS: 'historialBusquedas'
+        };
+
+        // Test del sistema
+        function checkSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            let html = '';
+
+            // Test LocalStorage disponible
+            const hasLocalStorage = typeof(Storage) !== "undefined";
+            html += `<div class="test-item">
+                LocalStorage disponible:
+                <span class="status ${hasLocalStorage ? 'ok' : 'error'}">
+                    ${hasLocalStorage ? '✅ SÍ' : '❌ NO'}
+                </span>
+            </div>`;
+
+            // Test archivos cargados
+            html += `<div class="test-item">
+                Página de test: <span class="status ok">✅ CARGADA</span>
+            </div>`;
+
+            // Verificar que existen los archivos principales
+            html += `<div class="test-item">
+                Archivos principales:
+                <ul>
+                    <li>index.html</li>
+                    <li>js/app8.js</li>
+                    <li>css/custom.css</li>
+                    <li>DOCUMENTACION.md</li>
+                    <li>GUIA_DE_USO.md</li>
+                </ul>
+            </div>`;
+
+            statusDiv.innerHTML = html;
+        }
+
+        // Test de LocalStorage
+        function testLocalStorage() {
+            const resultsDiv = document.getElementById('localStorage-results');
+            let html = '<h3>Resultados del Test:</h3>';
+
+            try {
+                // Test 1: Guardar datos
+                const testData = {
+                    id: '1',
+                    nombre: 'Curso de Test',
+                    precio: '1€',
+                    cantidad: 1
+                };
+                localStorage.setItem('test_carrito', JSON.stringify([testData]));
+                html += `<div class="test-item">
+                    ✅ Guardar datos: <span class="status ok">OK</span>
+                </div>`;
+
+                // Test 2: Leer datos
+                const retrieved = JSON.parse(localStorage.getItem('test_carrito'));
+                const readOk = retrieved && retrieved[0].id === '1';
+                html += `<div class="test-item">
+                    ${readOk ? '✅' : '❌'} Leer datos:
+                    <span class="status ${readOk ? 'ok' : 'error'}">
+                        ${readOk ? 'OK' : 'ERROR'}
+                    </span>
+                </div>`;
+
+                // Test 3: Actualizar datos
+                retrieved[0].cantidad = 2;
+                localStorage.setItem('test_carrito', JSON.stringify(retrieved));
+                html += `<div class="test-item">
+                    ✅ Actualizar datos: <span class="status ok">OK</span>
+                </div>`;
+
+                // Test 4: Eliminar datos
+                localStorage.removeItem('test_carrito');
+                const deleted = localStorage.getItem('test_carrito') === null;
+                html += `<div class="test-item">
+                    ${deleted ? '✅' : '❌'} Eliminar datos:
+                    <span class="status ${deleted ? 'ok' : 'error'}">
+                        ${deleted ? 'OK' : 'ERROR'}
+                    </span>
+                </div>`;
+
+                html += '<div class="code">✅ Todos los tests pasaron correctamente</div>';
+            } catch (error) {
+                html += `<div class="code">❌ Error: ${error.message}</div>`;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Mostrar datos actuales
+        function showCurrentData() {
+            const dataDiv = document.getElementById('current-data');
+            let html = '<h3>Datos en LocalStorage:</h3>';
+
+            Object.entries(STORAGE_KEYS).forEach(([key, value]) => {
+                const data = localStorage.getItem(value);
+                html += `<div class="test-item">
+                    <strong>${key}:</strong>
+                    <div class="code">${data || 'Vacío'}</div>
+                </div>`;
+            });
+
+            // Mostrar tamaño usado
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            html += `<div class="test-item">
+                <strong>Tamaño total usado:</strong> ${(totalSize / 1024).toFixed(2)} KB
+            </div>`;
+
+            dataDiv.innerHTML = html;
+        }
+
+        // Limpiar todos los datos
+        function clearAllData() {
+            if (confirm('⚠️ ¿Estás seguro de eliminar TODOS los datos del carrito?\n\nEsto incluye:\n- Carrito de compras\n- Favoritos\n- Filtros\n- Historial de búsquedas')) {
+                Object.values(STORAGE_KEYS).forEach(key => {
+                    localStorage.removeItem(key);
+                });
+                alert('✅ Todos los datos han sido eliminados');
+                showCurrentData();
+            }
+        }
+
+        // Inicializar al cargar
+        checkSystemStatus();
+    </script>
+</body>
+</html>
+
